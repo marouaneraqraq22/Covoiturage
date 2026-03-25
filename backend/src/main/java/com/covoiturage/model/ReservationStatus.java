@@ -5,5 +5,7 @@ package com.covoiturage.model;
  */
 public enum ReservationStatus {
     PENDING,
-    CONFIRMED
+    CONFIRMED,
+    REJECTED,
+    CANCELED
 }

@@ -1,0 +1,103 @@
+export const MOROCCAN_CITIES = [
+  "Agadir",
+  "Al Hoceïma",
+  "Assa-Zag",
+  "Azilal",
+  "Benguérir",
+  "Béni Mellal",
+  "Benslimane",
+  "Berrechid",
+  "Boujdour",
+  "Boulemane",
+  "Casablanca",
+  "Chefchaouen",
+  "Chichaoua",
+  "Dakhla",
+  "Dar Bouazza",
+  "El Jadida",
+  "El Kelaâ des Sraghna",
+  "Errachidia",
+  "Es-Semara",
+  "Essaouira",
+  "Fès",
+  "Figuig",
+  "Fquih Ben Salah",
+  "Guelmim",
+  "Guercif",
+  "Ifrane",
+  "Inezgane",
+  "Itzer",
+  "Jerada",
+  "Kénitra",
+  "Khémisset",
+  "Khénifra",
+  "Khouribga",
+  "Ksar El Kébir",
+  "Laâyoune",
+  "Larache",
+  "Marrakech",
+  "Médiouna",
+  "Meknès",
+  "Midelt",
+  "Mohammédia",
+  "Nador",
+  "Nouaceur",
+  "Ouarzazate",
+  "Ouazzane",
+  "Oujda",
+  "Oulmes",
+  "Rabat",
+  "Safi",
+  "Saïdia",
+  "Salé",
+  "Sefrou",
+  "Settat",
+  "Sidi Bennour",
+  "Sidi Ifni",
+  "Sidi Kacem",
+  "Sidi Slimane",
+  "Skhirat",
+  "Tanger",
+  "Tan-Tan",
+  "Taounate",
+  "Taourirt",
+  "Tarfaya",
+  "Taroudant",
+  "Tata",
+  "Taza",
+  "Témara",
+  "Tétouan",
+  "Tinghir",
+  "Tiznit",
+  "Youssoufia",
+  "Zagora"
+].sort((a, b) => a.localeCompare(b, 'fr'));
+
+export const CASABLANCA_NEIGHBORHOODS = [
+  // --- ANFA (Cœur de ville & Standing) ---
+  "Aïn Diab", "Anfa Supérieur", "Bourgogne", "Casablanca Finance City (CFC)", 
+  "Gauthier", "L'Oasis", "Maârif", "Maârif Extension", "Palmier", "Racine", 
+  "Val Fleuri", "Quartier des Hôpitaux", "Riviera",
+
+  // --- HAY HASSANI / AÏN CHOCK (Sud & Extension) ---
+  "Aïn Chock", "Azhar", "Californie", "Casanearshore", "Laymoun", 
+  "Hay Hassani", "Inara", "Lissasfa", "Longchamps", "Mandarona", 
+  "Oulfa", "Polo", "Sidi Maârouf",
+
+  // --- MERS SULTAN / EL FIDA (Historique & Commerce) ---
+  "2 Mars", "Belvédère", "Bouchentouf", "Centre Ville", "Derb Ghallef", 
+  "Derb Lihoudi", "Derb Milan", "Derb السلطان (Sultan)", "Habous", 
+  "Lafayette", "Liberté", "Mers Sultan", "Victor Hugo",
+
+  // --- AÏN SEBAÂ / HAY MOHAMMADI / ROCHES NOIRES (Est & Industriel) ---
+  "Aïn Sebaâ", "Beauséjour", "Belvédère", "Hay Mohammadi", "Mimosa", 
+  "Roches Noires", "Sidi Bernoussi", "Sidi Moumen",
+
+  // --- MOULAY RACHID / SIDI OTMANE (Est résidentiel) ---
+  "Hay Moulay Rachid", "Lalla Meriem", "Mabrouka", "Salmia", "Sbata", 
+  "Sidi Otmane",
+
+  // --- PÉRIPHÉRIE & NOUVELLES ZONES ---
+  "Dar Bouazza", "Bouskoura (Ville Verte)", "Errahma", "Mediouna", "Tit Mellil"
+].filter((item, index, self) => item !== "" && self.indexOf(item) === index) // Supprime les vides et doublons
+ .sort((a, b) => a.localeCompare(b, 'fr'));

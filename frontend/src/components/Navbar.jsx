@@ -32,19 +32,29 @@ const Navbar = () => {
                   </Link>
                 )}
                 {user?.role === 'CONDUCTEUR' && (
-                  <Link to="/proposer" className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors relative group">
-                    Proposer un trajet
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
-                  </Link>
+                  <>
+                    <Link to="/proposer" className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors relative group">
+                      Proposer un trajet
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                    <Link to="/mes-trajets" className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors relative group">
+                      Mes annonces
+                      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
+                    </Link>
+                  </>
                 )}
                 <Link to="/mes-reservations" className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors relative group">
                   Mes réservations
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <div className="flex items-center gap-2 pl-4 border-l border-slate-200 ml-2">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold shadow-md transform transition hover:scale-110">
+                  <Link 
+                    to="/profil"
+                    className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold shadow-md transform transition hover:scale-110"
+                    title="Mon Profil"
+                  >
                     {user?.nom?.charAt(0).toUpperCase()}
-                  </div>
+                  </Link>
                   <button 
                     onClick={handleLogout}
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all duration-300 transform hover:rotate-12"

@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Search, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
+import { MOROCCAN_CITIES, CASABLANCA_NEIGHBORHOODS } from '../utils/constants';
+import CustomSelect from '../components/CustomSelect';
 
 const Home = () => {
+  const { showSuccess, showError, showInfo } = useNotification();
   const [searchParams, setSearchParams] = useState({
+    typeTrajet: 'VILLE_A_VILLE',
     depart: '',
     arrivee: '',
     date: ''
@@ -33,7 +38,7 @@ const Home = () => {
     setLoading(true);
     setHasSearched(true);
     try {
-      const res = await api.get(`/trajets/search?depart=${searchParams.depart}&arrivee=${searchParams.arrivee}&date=${searchParams.date}`);
+      const res = await api.get(`/trajets/search?type=${searchParams.typeTrajet}&depart=${searchParams.depart}&arrivee=${searchParams.arrivee}&date=${searchParams.date}`);
       setTrajets(res.data);
     } catch (error) {
       console.error("Erreur de recherche", error);
@@ -45,26 +50,26 @@ const Home = () => {
   const handleReservation = async (trajetId) => {
     try {
       await api.post(`/reservations/trajet/${trajetId}`);
-      alert('Réservation effectuée avec succès !');
-      // Mettre à jour la disponibilité locale
-      if (hasSearched) {
-        setTrajets(trajets.map(t => t.id === trajetId ? { ...t, placesDisponibles: t.placesDisponibles - 1 } : t));
-      } else {
-        setAllTrajets(allTrajets.map(t => t.id === trajetId ? { ...t, placesDisponibles: t.placesDisponibles - 1 } : t));
-      }
+      showSuccess('Demande envoyée ! En attente de confirmation du conducteur.');
     } catch (error) {
       if (error.response?.status === 401) {
-        alert("Vous devez être connecté pour réserver.");
+        showInfo("Vous devez être connecté pour réserver.");
         window.location.href = '/login';
       } else {
-        alert(error.response?.data || "Erreur lors de la réservation");
+        const errorMsg = typeof error.response?.data === 'string' 
+          ? error.response.data 
+          : (error.response?.data?.message || "Erreur lors de la réservation");
+        showError(errorMsg);
       }
     }
   };
 
   const TrajetCard = ({ trajet }) => (
     <div className="glass-card rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 relative overflow-hidden group transform hover:-translate-y-1 cursor-pointer">
-      <div className="absolute top-0 right-0 bg-gradient-to-l from-primary-600 to-primary-400 text-white px-4 py-1.5 rounded-bl-xl font-bold tracking-wide shadow-md">
+      <div className={`absolute top-0 left-0 text-white px-3 py-1 rounded-br-xl text-xs font-bold tracking-wider shadow-sm z-10 ${trajet.typeTrajet === 'INTRA_CASABLANCA' ? 'bg-purple-600' : 'bg-blue-600'}`}>
+        {trajet.typeTrajet === 'INTRA_CASABLANCA' ? '📍 INTRA-CASA' : '🚗 VILLE À VILLE'}
+      </div>
+      <div className="absolute top-0 right-0 bg-gradient-to-l from-primary-600 to-primary-400 text-white px-4 py-1.5 rounded-bl-xl font-bold tracking-wide shadow-md z-10">
         {trajet.prix} MAD
       </div>
       
@@ -132,20 +137,32 @@ const Home = () => {
       </div>
 
       {/* Search Bar (Overlapping Hero) */}
-      <div className="max-w-5xl mx-auto px-4 -mt-20 relative z-20 mb-20 animate-scale-in" style={{ animationDelay: '0.2s' }}>
-        <form onSubmit={handleSearch} className="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-center gap-3">
+      <div className="max-w-5xl mx-auto px-4 -mt-24 relative z-20 mb-20 animate-scale-in" style={{ animationDelay: '0.2s' }}>
+        <div className="flex bg-white/20 backdrop-blur-md p-1 rounded-xl w-full max-w-md mx-auto mb-4 cursor-pointer border border-white/30 shadow-lg">
+          <button
+            type="button"
+            onClick={() => setSearchParams({ ...searchParams, typeTrajet: 'VILLE_A_VILLE', depart: '', arrivee: '' })}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${searchParams.typeTrajet === 'VILLE_A_VILLE' ? 'bg-white text-primary-600 shadow-md scale-100' : 'text-white hover:bg-white/10 scale-95'}`}
+          >
+            Ville à ville
+          </button>
+          <button
+            type="button"
+            onClick={() => setSearchParams({ ...searchParams, typeTrajet: 'INTRA_CASABLANCA', depart: '', arrivee: '' })}
+            className={`flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all duration-300 ${searchParams.typeTrajet === 'INTRA_CASABLANCA' ? 'bg-white text-primary-600 shadow-md scale-100' : 'text-white hover:bg-white/10 scale-95'}`}
+          >
+            Intra-Casablanca
+          </button>
+        </div>
+        <form onSubmit={handleSearch} className="glass-card rounded-2xl p-4 flex flex-col md:flex-row items-center gap-3 mt-4">
           
           <div className="flex-1 relative w-full md:w-auto">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary-400">
-              <MapPin className="h-5 w-5" />
-            </div>
-            <input 
-              type="text" 
-              required 
-              className="w-full bg-slate-50/80 hover:bg-white border-0 rounded-xl focus:ring-2 focus:ring-primary-500 pl-12 py-3.5 text-slate-900 placeholder:text-slate-500 font-medium transition-all" 
-              placeholder="Point de départ" 
-              value={searchParams.depart} 
-              onChange={e => setSearchParams({...searchParams, depart: e.target.value})} 
+            <CustomSelect
+              value={searchParams.depart}
+              onChange={(val) => setSearchParams({...searchParams, depart: val})}
+              placeholder={searchParams.typeTrajet === 'VILLE_A_VILLE' ? 'Ville de départ' : 'Quartier de départ'}
+              options={searchParams.typeTrajet === 'VILLE_A_VILLE' ? MOROCCAN_CITIES : CASABLANCA_NEIGHBORHOODS}
+              icon={<MapPin className="h-5 w-5" />}
             />
           </div>
 
@@ -154,16 +171,12 @@ const Home = () => {
           </div>
 
           <div className="flex-1 relative w-full md:w-auto">
-             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-primary-400">
-              <MapPin className="h-5 w-5" />
-            </div>
-            <input 
-              type="text" 
-              required 
-              className="w-full bg-slate-50/80 hover:bg-white border-0 rounded-xl focus:ring-2 focus:ring-primary-500 pl-12 py-3.5 text-slate-900 placeholder:text-slate-500 font-medium transition-all" 
-              placeholder="Destination" 
-              value={searchParams.arrivee} 
-              onChange={e => setSearchParams({...searchParams, arrivee: e.target.value})} 
+            <CustomSelect
+              value={searchParams.arrivee}
+              onChange={(val) => setSearchParams({...searchParams, arrivee: val})}
+              placeholder={searchParams.typeTrajet === 'VILLE_A_VILLE' ? "Ville d'arrivée" : "Quartier d'arrivée"}
+              options={searchParams.typeTrajet === 'VILLE_A_VILLE' ? MOROCCAN_CITIES : CASABLANCA_NEIGHBORHOODS}
+              icon={<MapPin className="h-5 w-5" />}
             />
           </div>
 

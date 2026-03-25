@@ -10,4 +10,5 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findByPassagerId(Long passagerId);
     List<Reservation> findByTrajetId(Long trajetId);
+    boolean existsByPassagerIdAndTrajetId(Long passagerId, Long trajetId);
 }

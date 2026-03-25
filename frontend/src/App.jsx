@@ -10,11 +10,15 @@ import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel';
 import MesReservations from './pages/MesReservations';
 import ProposerTrajet from './pages/ProposerTrajet';
+import MesTrajets from './pages/MesTrajets';
+import Profil from './pages/Profil';
+import { NotificationProvider } from './contexts/NotificationContext';
 import './index.css'; // Assure-toi que le chemin est correct vers ton fichier CSS
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <NotificationProvider>
+      <Router>
+        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
         <Navbar />
         <main className="flex-grow">
           <Routes>
@@ -24,28 +28,46 @@ function App() {
             <Route path="/register" element={<Register />} />
 
             {/* Routes protégées standard (Passager/Conducteur/Admin) */}
-            <Route 
-              path="/mes-reservations" 
+            <Route
+              path="/mes-reservations"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute roles={['PASSAGER', 'CONDUCTEUR']}>
                   <MesReservations />
                 </ProtectedRoute>
-              } 
+              }
+            />
+
+            {/* Route Profil */}
+            <Route
+              path="/profil"
+              element={
+                <ProtectedRoute>
+                  <Profil />
+                </ProtectedRoute>
+              }
             />
 
             {/* Routes Conducteur */}
-            <Route 
-              path="/proposer" 
+            <Route
+              path="/proposer"
               element={
                 <ProtectedRoute requiredRole="CONDUCTEUR">
                   <ProposerTrajet />
                 </ProtectedRoute>
-              } 
+              }
+            />
+            <Route
+              path="/mes-trajets"
+              element={
+                <ProtectedRoute requiredRole="CONDUCTEUR">
+                  <MesTrajets />
+                </ProtectedRoute>
+              }
             />
 
             {/* Routes Admin */}
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute requiredRole="ADMIN">
                   <AdminPanel />
@@ -58,7 +80,8 @@ function App() {
           </Routes>
         </main>
       </div>
-    </Router>
+      </Router>
+    </NotificationProvider>
   );
 }
 

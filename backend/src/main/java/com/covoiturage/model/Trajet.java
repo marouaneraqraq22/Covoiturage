@@ -23,6 +23,10 @@ public class Trajet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type_trajet")
+    private TypeTrajet typeTrajet = TypeTrajet.VILLE_A_VILLE;
+
     @Column(nullable = false)
     private String villeDepart;
 
@@ -39,7 +43,7 @@ public class Trajet {
 
     private double prix;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "conducteur_id", nullable = false)
     private User conducteur;
 }

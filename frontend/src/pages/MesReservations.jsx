@@ -1,10 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Ticket, Calendar, MapPin, Clock } from 'lucide-react';
+import { Ticket, Calendar, MapPin, Clock, Phone, XCircle } from 'lucide-react';
+import { useNotification } from '../contexts/NotificationContext';
 
 const MesReservations = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { showSuccess, showError } = useNotification();
+
+  const handleAnnuler = async (reservationId) => {
+    try {
+      const res = await api.put(`/reservations/${reservationId}/annuler`);
+      showSuccess(res.data);
+      setReservations(reservations.map(r => r.id === reservationId ? { ...r, statut: 'CANCELED' } : r));
+    } catch (error) {
+      const errorMsg = typeof error.response?.data === 'string' 
+        ? error.response.data 
+        : "Erreur lors de l'annulation.";
+      showError(errorMsg);
+    }
+  };
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -40,12 +55,25 @@ const MesReservations = () => {
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full uppercase tracking-wider">
-                    {reservation.statut}
+                  <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider ${
+                    reservation.statut === 'CONFIRMED' ? 'bg-green-100 text-green-800' :
+                    reservation.statut === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                    reservation.statut === 'CANCELED' ? 'bg-slate-100 text-slate-800' :
+                    'bg-orange-100 text-orange-800'
+                  }`}>
+                    {reservation.statut === 'CANCELED' ? 'ANNULÉE' : reservation.statut}
                   </span>
                   <span className="text-sm text-slate-500 font-medium">Réservation #{reservation.id}</span>
                 </div>
                 
+                {/* Afficher le téléphone du conducteur si réservation confirmée */}
+                {reservation.statut === 'CONFIRMED' && reservation.trajet.conducteur?.telephone && (
+                  <a href={`tel:${reservation.trajet.conducteur.telephone}`} className="flex items-center gap-2 bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg transition-colors text-sm font-semibold border border-green-200 mb-3 w-fit">
+                    <Phone className="w-4 h-4" />
+                    Appeler le conducteur
+                  </a>
+                )}
+
                 <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-2">
                   <MapPin className="w-5 h-5 text-primary-500" />
                   {reservation.trajet.villeDepart} <ArrowRight className="w-4 h-4 text-slate-400" /> {reservation.trajet.villeArrivee}
@@ -66,6 +94,23 @@ const MesReservations = () => {
               <div className="w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-100 sm:border-l sm:pl-6 flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1">
                 <span className="text-sm font-medium text-slate-500">Montant</span>
                 <span className="text-2xl font-bold text-primary-600">{reservation.trajet.prix} MAD</span>
+                
+                {/* Bouton Annuler */}
+                {(reservation.statut === 'PENDING' || reservation.statut === 'CONFIRMED') && (() => {
+                  const departDateTime = new Date(`${reservation.trajet.dateDepart}T${reservation.trajet.heureDepart}`);
+                  const diffHours = (departDateTime - new Date()) / (1000 * 60 * 60);
+                  if (diffHours > 1) {
+                    return (
+                      <button 
+                        onClick={() => handleAnnuler(reservation.id)}
+                        className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-colors border border-red-200"
+                      >
+                        <XCircle className="w-4 h-4" /> Annuler
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               
             </div>

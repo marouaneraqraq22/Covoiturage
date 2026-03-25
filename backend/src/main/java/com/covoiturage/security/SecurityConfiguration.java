@@ -32,8 +32,9 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // Autoriser TOUS les GET sur les trajets (consultation publique)
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/trajets/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/trajets", "/api/trajets/**").permitAll()
                         // Si tu as une route spécifique pour la recherche, elle est incluse au-dessus,
                         // mais tu peux la laisser par sécurité :
                         .requestMatchers("/api/trajets/search").permitAll()
